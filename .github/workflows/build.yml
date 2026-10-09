@@ -30,16 +30,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           if ! gh release view "v${{ inputs.version }}" -R "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            gh release create "v${{ inputs.version }}" -R "$GITHUB_REPOSITORY" \
-              --title "Dictéa ${{ inputs.version }}" \
-              --notes "Installeurs de **Dictéa** ${{ inputs.version }} — dictée vocale 100 % locale.
-
-**Installation**
-- **macOS** : glissez Dictéa dans Applications, puis clic droit → Ouvrir au premier lancement (app non signée).
-- **Windows** : lancez le .exe ; si SmartScreen s'affiche, « Informer seulement ».
-- **Linux** : \`chmod +x Dictea*.AppImage && ./Dictea*.AppImage\`
-
-Gratuit : 1000 mots/mois, sans compte. Transcription par NVIDIA Parakeet TDT 0.6B v3 (© NVIDIA Corporation, CC BY 4.0)."
+            gh release create "v${{ inputs.version }}" -R "$GITHUB_REPOSITORY" --title "Dictéa ${{ inputs.version }}" --notes "Dictéa ${{ inputs.version }} — dictée vocale 100 % locale. macOS : glissez Dictéa dans Applications, puis clic droit → Ouvrir au premier lancement (app non signée). Windows : lancez le .exe, choisissez « Informer seulement » si SmartScreen s'affiche. Linux : chmod +x Dictea*.AppImage puis ./Dictea*.AppImage. Gratuit : 1000 mots/mois, sans compte. Transcription par NVIDIA Parakeet TDT 0.6B v3 (© NVIDIA Corporation, CC BY 4.0)."
           fi
 
   build:
