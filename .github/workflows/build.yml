@@ -17,9 +17,6 @@ on:
 permissions:
   contents: write
 
-env:
-  HF_BASE: https://huggingface.co/nasedkinpv/parakeet-tdt-0.6b-v3-onnx-int8/resolve/main
-
 jobs:
   release:
     name: Créer la release v${{ inputs.version }}
@@ -77,31 +74,59 @@ jobs:
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
 
-      - name: Cache des modèles Parakeet (902 Mo)
-        uses: actions/cache@v4
-        with:
-          path: src/models
-          key: parakeet-int8-v1-${{ matrix.os }}
-
-      - name: Téléchargement des modèles (hors Git)
+      - name: Vérifier que les modèles restent HORS de src/
         shell: bash
         run: |
-          mkdir -p src/models
-          for f in encoder-int8.onnx encoder-int8.onnx.data decoder_joint-int8.onnx vocab.txt; do
-            if [ ! -s "src/models/$f" ]; then
-              curl -L --fail --retry 3 --retry-delay 5 -o "src/models/$f" "$HF_BASE/$f"
-            fi
-          done
-          ls -la src/models
+          # Tout ce qui est sous src/ est embarqué dans le binaire Tauri :
+          # un fichier de modèle y ferait retomber l'installeur à ~700 Mo.
+          if [ -d src/models ]; then
+            echo "::error::src/models existe — les modèles doivent vivre dans models/ (gitignoré)."
+            exit 1
+          fi
+          echo "OK : src = $(du -sh src | cut -f1)"
 
-      - name: Build + upload sur la release
-        uses: tauri-apps/tauri-action@v0
+      - name: Construire l'installeur
+        shell: bash
+        run: npx tauri build --target "${{ matrix.target }}"
+
+      - name: macOS — Resources + signature ad-hoc (sinon « disque endommagé »)
+        if: runner.os == 'macOS'
+        shell: bash
+        # Même opération que src-tauri/scripts/bundle-macos.sh, mais sans ses
+        # chemins codés en dur (target/release/, _aarch64.dmg) : en CI on passe
+        # --target, donc le bundle vit dans target/<triple>/release/bundle.
+        run: |
+          set -eu
+          app=$(find src-tauri/target -type d -name "*.app" | head -1)
+          dmg=$(find src-tauri/target -type f -name "*.dmg" | head -1)
+          [ -n "$app" ] && [ -n "$dmg" ] || { echo "::error::.app ou .dmg introuvable"; exit 1; }
+          echo "app=$app"
+          echo "dmg=$dmg"
+          mkdir -p "$app/Contents/Resources"
+          : > "$app/Contents/Resources/.keep"
+          codesign --force --sign - "$app"
+          codesign --verify --strict --deep --verbose=2 "$app"
+          stage=$(mktemp -d)
+          cp -R "$app" "$stage/"
+          ln -s /Applications "$stage/Applications"
+          rm -f "$dmg"
+          hdiutil create -volname "Dictéa" -srcfolder "$stage" -ov -format UDZO \
+            -imagekey zlib-level=9 "$dmg" >/dev/null
+          rm -rf "$stage"
+          echo "OK : $(stat -f%z "$dmg") octets"
+
+      - name: Publier les fichiers sur la release
+        shell: bash
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          args: --target ${{ matrix.target }}
-          tagName: v${{ inputs.version }}
-          releaseName: Dictéa ${{ inputs.version }}
-          releaseDraft: false
-          prerelease: false
-          includeDebug: false
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          shopt -s nullglob
+          base="src-tauri/target/${{ matrix.target }}/release/bundle"
+          files=( "$base"/dmg/*.dmg "$base"/msi/*.msi "$base"/nsis/*.exe "$base"/appimage/*.AppImage "$base"/deb/*.deb )
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "::error::aucun installeur trouvé dans $base"
+            find src-tauri/target -maxdepth 5 -type d -name bundle || true
+            exit 1
+          fi
+          ls -lh "${files[@]}"
+          gh release upload "v${{ inputs.version }}" "${files[@]}" --clobber -R "$GITHUB_REPOSITORY"
