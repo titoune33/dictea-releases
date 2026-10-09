@@ -42,7 +42,7 @@ jobs:
           - os: macos-latest
             target: aarch64-apple-darwin
             name: mac-silicon
-          - os: macos-13
+          - os: macos-latest
             target: x86_64-apple-darwin
             name: mac-intel
           - os: windows-latest
@@ -63,6 +63,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+
+      - name: Installer les dépendances npm
+        shell: bash
+        run: npm ci || npm install --no-audit --no-fund
 
       - name: Rust stable + cible
         uses: dtolnay/rust-toolchain@stable
