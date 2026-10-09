@@ -46,12 +46,19 @@ jobs:
           - os: macos-latest
             target: aarch64-apple-darwin
             name: mac-silicon
-            bundles: dmg
+            # app + dmg : avec `dmg` seul, Tauri supprime le .app intermédiaire
+            # (« Cleaning Dictea.app ») et l'étape de signature ne le trouve plus.
+            bundles: app,dmg
           - os: windows-latest
             target: x86_64-pc-windows-msvc
             name: windows
             bundles: nsis
-          - os: ubuntu-22.04
+          # ubuntu-24.04 imposé : les binaires ONNX Runtime précompilés d'ort-sys
+          # référencent des symboles glibc récents (__isoc23_*, ≥ 2.38) absents
+          # de la glibc 2.35 d'ubuntu-22.04 → édition de liens impossible.
+          # Contrepartie : les binaires exigent une glibc récente côté utilisateur
+          # (Ubuntu 24.04+, distribs 2024+), à documenter sur le site.
+          - os: ubuntu-24.04
             target: x86_64-unknown-linux-gnu
             name: linux
             bundles: deb,appimage
@@ -107,7 +114,11 @@ jobs:
           set -eu
           app=$(find src-tauri/target -type d -name "*.app" | head -1)
           dmg=$(find src-tauri/target -type f -name "*.dmg" | head -1)
-          [ -n "$app" ] && [ -n "$dmg" ] || { echo "::error::.app ou .dmg introuvable"; exit 1; }
+          if [ -z "$app" ] || [ -z "$dmg" ]; then
+            echo "::error::.app ou .dmg introuvable — contenu de target :"
+            find src-tauri/target -maxdepth 6 \( -name "*.app" -o -name "*.dmg" \) || true
+            exit 1
+          fi
           echo "app=$app"
           echo "dmg=$dmg"
           mkdir -p "$app/Contents/Resources"
