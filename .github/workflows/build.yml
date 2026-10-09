@@ -36,18 +36,25 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          # `bundles` = types d'installeurs supportés par la plateforme hôte
+          # (tauri.conf.json ne liste que dmg/app : sans override, Windows et
+          # Linux produisent 0 installeur).
           - os: macos-latest
             target: aarch64-apple-darwin
             name: mac-silicon
+            bundles: dmg
           - os: macos-latest
             target: x86_64-apple-darwin
             name: mac-intel
+            bundles: dmg
           - os: windows-latest
             target: x86_64-pc-windows-msvc
             name: windows
+            bundles: nsis
           - os: ubuntu-22.04
             target: x86_64-unknown-linux-gnu
             name: linux
+            bundles: deb,appimage
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout du dépôt source privé
@@ -72,7 +79,8 @@ jobs:
 
       - name: Dépendances Linux
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+        # alsa-sys (cpal → capture micro) exige libasound2-dev + pkg-config.
+        run: sudo apt-get update && sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libasound2-dev pkg-config
 
       - name: Vérifier que les modèles restent HORS de src/
         shell: bash
@@ -87,7 +95,7 @@ jobs:
 
       - name: Construire l'installeur
         shell: bash
-        run: npx tauri build --target "${{ matrix.target }}"
+        run: npx tauri build --target "${{ matrix.target }}" --bundles "${{ matrix.bundles }}"
 
       - name: macOS — Resources + signature ad-hoc (sinon « disque endommagé »)
         if: runner.os == 'macOS'
