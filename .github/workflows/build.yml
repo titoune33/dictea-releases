@@ -123,6 +123,10 @@ jobs:
           echo "dmg=$dmg"
           mkdir -p "$app/Contents/Resources"
           : > "$app/Contents/Resources/.keep"
+          # Permission micro (parité Murmure) : sans elle, macOS refuse la
+          # capture en silence au premier lancement.
+          /usr/libexec/PlistBuddy -c "Add :NSMicrophoneUsageDescription string Dictéa a besoin du micro pour transcrire votre voix en texte, 100 % en local sur ce Mac." "$app/Contents/Info.plist" 2>/dev/null \
+            || /usr/libexec/PlistBuddy -c "Set :NSMicrophoneUsageDescription Dictéa a besoin du micro pour transcrire votre voix en texte, 100 % en local sur ce Mac." "$app/Contents/Info.plist"
           codesign --force --sign - "$app"
           codesign --verify --strict --deep --verbose=2 "$app"
           stage=$(mktemp -d)
