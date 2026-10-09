@@ -39,13 +39,13 @@ jobs:
           # `bundles` = types d'installeurs supportés par la plateforme hôte
           # (tauri.conf.json ne liste que dmg/app : sans override, Windows et
           # Linux produisent 0 installeur).
+          # mac-intel (x86_64-apple-darwin) abandonné le 09/10/2026 (décision JEV) :
+          # ort-sys 2.0.0-rc.13 et Microsoft n'émettent plus de binaire ONNX Runtime
+          # x86_64 macOS ; workaround « from source » évalué à ~25-30 % de succès.
+          # À réouvrir sur demande client Intel concrète.
           - os: macos-latest
             target: aarch64-apple-darwin
             name: mac-silicon
-            bundles: dmg
-          - os: macos-latest
-            target: x86_64-apple-darwin
-            name: mac-intel
             bundles: dmg
           - os: windows-latest
             target: x86_64-pc-windows-msvc
