@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dictéa — Dictez. Rien ne sort de votre machine.</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23040609'/%3E%3Cg fill='%23f7b83d'%3E%3Crect x='14' y='26' width='5' height='12' rx='2.5'/%3E%3Crect x='22' y='20' width='5' height='24' rx='2.5'/%3E%3Crect x='30' y='14' width='5' height='36' rx='2.5'/%3E%3Crect x='38' y='22' width='5' height='20' rx='2.5'/%3E%3Crect x='46' y='27' width='5' height='10' rx='2.5'/%3E%3C/g%3E%3C/svg%3E">
+<style>
+:root{--bg:#040609;--surface:#060a0d;--text:#dbdee1;--muted:#80878d;--primary:#aec0d0;--accent:#f7b83d;--line:#161b20;--radius:14px}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;line-height:1.6}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+nav{height:68px;display:flex;align-items:center;gap:28px}.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1.05rem;text-decoration:none;color:var(--text)}
+nav .links{display:flex;gap:24px;margin-left:auto}nav .links a{color:var(--muted);text-decoration:none;font-size:.95rem}
+.btn{display:inline-block;background:var(--primary);color:#040609;font-weight:700;padding:13px 30px;border-radius:12px;text-decoration:none;font-size:1.05rem;white-space:nowrap}
+.btn:active{transform:translateY(1px)}.btn.small{padding:9px 20px;font-size:.92rem}
+.film{padding:40px 0 8px}.film video{width:100%;border-radius:var(--radius);border:1px solid var(--line);display:block;background:#000}
+.hero{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center;padding:64px 0 72px}
+.hero h1{font-size:3rem;line-height:1.08;letter-spacing:-.02em;margin:0 0 14px}
+.hero p.sub{color:var(--muted);font-size:1.12rem;max-width:44ch;margin:0 0 28px}
+.preview{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:28px}
+.preview .microw{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+.micbtn{width:56px;height:56px;border-radius:50%;background:var(--accent);border:0;flex:none}
+.wave{display:flex;align-items:center;gap:4px;height:40px}.wave i{width:4px;background:var(--accent);border-radius:2px;opacity:.9}
+.transcript{font-size:.95rem;border-top:1px solid var(--line);padding-top:14px;min-height:66px}
+.transcript .live{color:var(--muted)}
+section{padding:52px 0}h2{font-size:1.7rem;letter-spacing:-.01em;margin:0 0 8px}
+.steps{border-top:1px solid var(--line);margin-top:24px}.step{display:grid;grid-template-columns:64px 1fr;gap:16px;padding:20px 0;border-bottom:1px solid var(--line)}
+.step b{color:var(--accent);font-size:1.3rem}.step p{margin:4px 0 0;color:var(--muted)}
+.plans{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:24px}
+.plan{border:1px solid var(--line);border-radius:var(--radius);padding:28px;background:var(--surface)}
+.plan.hi{border-color:var(--accent)}.plan h3{margin:0 0 4px;font-size:1.1rem}.plan .prix{font-size:2rem;font-weight:700;margin:8px 0}.plan .prix small{font-size:.95rem;color:var(--muted);font-weight:400}
+.plan ul{margin:12px 0 0;padding-left:20px;color:var(--muted)}.plan li{margin:6px 0}
+.conf{border-top:1px solid var(--line)}.conf p{max-width:65ch;color:var(--muted)}
+details{border-bottom:1px solid var(--line);padding:14px 0}summary{cursor:pointer;font-weight:600}details p{color:var(--muted);margin:8px 0 0;max-width:65ch}
+footer{border-top:1px solid var(--line);padding:28px 0;color:var(--muted);font-size:.85rem;display:flex;gap:24px}
+@media(max-width:768px){.hero{grid-template-columns:1fr;padding:48px 0}.hero h1{font-size:2.2rem}nav .links{display:none}.plans{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav><a class="brand" href="#"><svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#060a0d"/><g fill="#f7b83d"><rect x="14" y="26" width="5" height="12" rx="2.5"/><rect x="22" y="20" width="5" height="24" rx="2.5"/><rect x="30" y="14" width="5" height="36" rx="2.5"/><rect x="38" y="22" width="5" height="20" rx="2.5"/><rect x="46" y="27" width="5" height="10" rx="2.5"/></g></svg>Dictéa</a><div class="links"><a href="#preuve">Preuve</a><a href="#tarifs">Tarifs</a><a href="#conf">Confidentialité</a><a href="#faq">FAQ</a></div><a class="btn small" href="https://buy.stripe.com/cNibIUbTDghnekM2ii7ok0Q" style="margin-left:auto">Passer à Illimité</a></nav>
+<div class="film" id="telecharger" style="padding-top:32px"><h2 style="margin-bottom:6px">Télécharger Dictéa</h2><p style="color:var(--muted);margin:0 0 18px;max-width:65ch">Gratuit : 1000 mots par mois, sans compte. macOS Apple Silicon disponible aujourd'hui :</p><div style="display:flex;gap:12px;flex-wrap:wrap"><a class="btn small" id="dl-mac-silicon" href="https://github.com/titoune33/dictea-releases/releases/download/v0.1.0/Dictea_0.1.0_aarch64.dmg" download>macOS Silicon — .dmg</a><a class="btn small" href="https://github.com/titoune33/dictea-releases/releases" style="background:transparent;border:1px solid var(--line);color:var(--text)">Toutes les versions</a></div>
+<ul style="color:var(--muted);font-size:.85rem;padding-left:20px;margin:14px 0 0;max-width:70ch">
+<li><strong>macOS</strong> : ouvrez le .dmg, glissez Dictéa dans Applications, puis clic droit → Ouvrir au premier lancement (app non signée).</li>
+<li><strong>Windows</strong> : exécutez le .exe, gardez « Informer seulement » si SmartScreen s'en mêle.</li>
+<li><strong>Linux</strong> : <code>chmod +x Dictea*.AppImage &amp;&amp; ./Dictea*.AppImage</code>.</li>
+<li>Installez Dictéa en moins d'une minute : l'installateur fait moins de 5&nbsp;Mo, le modèle de reconnaissance (890&nbsp;Mo) est mis de côté au premier lancement, une seule fois. Aucun compte n'est nécessaire.</li>
+</ul>
+<div class="film"><video src="dictea-30s.mp4" poster="dictea-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Dictéa en 30 secondes"></video></div>
+<header class="hero"><div><h1>Dictez. Rien ne sort de votre machine.</h1><p class="sub">Dictéa transforme votre voix en texte à la vitesse de la parole — 100&nbsp;% en local, sans cloud ni abonnement caché.</p><a class="btn" href="https://buy.stripe.com/cNibIUbTDghnekM2ii7ok0Q">Passer à Illimité — 5&nbsp;€/mois</a></div>
+<div class="preview" aria-label="Aperçu réel de l'interface Dictéa"><div class="microw"><button class="micbtn" aria-label="Enregistrer"></button><div class="wave" aria-hidden="true"><i style="height:12px"></i><i style="height:24px"></i><i style="height:36px"></i><i style="height:20px"></i><i style="height:28px"></i><i style="height:14px"></i><i style="height:30px"></i><i style="height:18px"></i><i style="height:26px"></i><i style="height:12px"></i></div></div><p class="transcript">«&nbsp;Préparer le compte-rendu de la réunion de mardi…&nbsp;»<br><span class="live">1000 mots gratuits par mois, sans compte.</span></p></div></header>
+<section id="preuve"><h2>La preuve en 30 secondes</h2><div class="steps"><div class="step"><b>1</b><div>Installez Dictéa.<p>Coupez le réseau si vous voulez vérifier.</p></div></div><div class="step"><b>2</b><div>Parlez.<p>La transcription s'affiche sous vos yeux, en français.</p></div></div><div class="step"><b>3</b><div>Collez où vous voulez.<p>Mail, dossier patient, note, code.</p></div></div></div></section>
+<section id="micro"><h2>Votre téléphone devient micro</h2><p style="color:var(--muted);max-width:65ch">La PWA Dictéa Micro capte votre voix à distance et dicte sur votre Mac, sans fil — appairage par token, traduction configurables, service worker pour le hors-ligne.</p></section>
+<section id="tarifs"><h2>Tarifs</h2><div class="plans"><div class="plan"><h3>Gratuit</h3><p class="prix">0&nbsp;€ <small>/ pour toujours</small></p><ul><li>1000 mots par mois</li><li>Français, 100&nbsp;% local</li><li>Micro-téléphone inclus</li></ul></div><div class="plan hi"><h3>Illimité</h3><p class="prix">5&nbsp;€ <small>/ mois, sans engagement</small></p><ul><li>Mots illimités</li><li>Dictionnaire personnel</li><li>Raccourcis personnalisés</li></ul><p><a class="btn" href="https://buy.stripe.com/cNibIUbTDghnekM2ii7ok0Q">Passer à Illimité</a></p></div></div></section>
+<section id="conf" class="conf"><h2>Confidentiel par construction</h2><p>Aucune donnée vocale ne quitte votre Mac : la reconnaissance tourne embarquée (Parakeet). Adapté aux professions tenues au secret — soignants, avocats, journalistes. Transcription par NVIDIA Parakeet TDT 0.6B v3 (© NVIDIA Corporation, CC BY 4.0).</p></section>
+<section id="faq"><h2>Questions</h2><details><summary>Mes enregistrements partent-ils sur internet ?</summary><p>Non. Tout tourne sur votre machine : une fois le modèle posé au premier lancement, coupez le réseau — ça dicte pareil.</p></details><details><summary>Quelles langues ?</summary><p>Le français d'abord (25 langues européennes supportées, détection automatique).</p></details><details><summary>Que se passe-t-il après 1000 mots ?</summary><p>La dictée se met en pause jusqu'au mois suivant, ou passez à Illimité pour 5 €/mois, sans engagement.</p></details><details><summary>Et si je change de Mac ?</summary><p>Votre clé de licence suit : collez-la dans Réglages après réinstallation.</p></details></section>
+<footer><div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;width:100%"><div><h3 style="margin:0 0 10px;font-size:1rem">Ressources</h3><p style="margin:6px 0"><a href="blog.html" style="color:var(--muted);text-decoration:none">Blog &amp; Décryptages</a></p><p style="margin:6px 0"><a href="glossaire.html" style="color:var(--muted);text-decoration:none">Glossaire</a></p></div><div><h3 style="margin:0 0 10px;font-size:1rem">Informations</h3><p style="margin:6px 0"><a href="confidentialite.html" style="color:var(--muted);text-decoration:none">Confidentialité</a></p><p style="margin:6px 0"><a href="cgv.html" style="color:var(--muted);text-decoration:none">CGV</a></p><p style="margin:6px 0"><a href="mentions-legales.html" style="color:var(--muted);text-decoration:none">Mentions légales</a></p><p style="margin:6px 0"><a href="cookies.html" style="color:var(--muted);text-decoration:none">Cookies &amp; traceurs</a></p><p style="margin:6px 0"><a href="sous-traitants.html" style="color:var(--muted);text-decoration:none">Sous-traitants</a></p><p style="margin:6px 0"><a href="#" id="cookie-prefs" style="color:var(--muted);text-decoration:none">Gérer mes préférences cookies</a></p></div></div></footer>
+<dialog id="cookie-dialog" style="background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:14px;padding:28px;max-width:440px"><h3 style="margin-top:0">Cookies : il n'y en a aucun</h3><p style="color:var(--muted)">Ce site ne dépose aucun cookie ni traceur : pas de mesure d'audience, pas de publicité. Seul le lien de paiement Stripe (hors site) applique ses propres règles.</p><p><button class="btn small" id="cookie-ok">Compris</button></p></dialog>
+<script>document.getElementById('cookie-prefs').addEventListener('click',function(e){e.preventDefault();document.getElementById('cookie-dialog').showModal()});document.getElementById('cookie-ok').addEventListener('click',function(){document.getElementById('cookie-dialog').close()})</script>
+</div>
+</body>
+</html>
