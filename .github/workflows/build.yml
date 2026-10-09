@@ -1,0 +1,112 @@
+name: Construire et publier Dictéa
+# Vit dans le dépôt PUBLIC (les binaires doivent être téléchargeables anonymement).
+# Le code source est dans le dépôt PRIVÉ titoune33/dictea, lu via une deploy key (lecture seule).
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version à publier, sans le v (ex. 0.1.1)"
+        required: true
+        default: "0.1.0"
+      ref:
+        description: "Ref du dépôt source à builder"
+        required: true
+        default: "main"
+
+permissions:
+  contents: write
+
+env:
+  HF_BASE: https://huggingface.co/nasedkinpv/parakeet-tdt-0.6b-v3-onnx-int8/resolve/main
+
+jobs:
+  release:
+    name: Créer la release v${{ inputs.version }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Release (idempotente)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if ! gh release view "v${{ inputs.version }}" -R "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create "v${{ inputs.version }}" -R "$GITHUB_REPOSITORY" \
+              --title "Dictéa ${{ inputs.version }}" \
+              --notes "Installeurs de **Dictéa** ${{ inputs.version }} — dictée vocale 100 % locale.
+
+**Installation**
+- **macOS** : glissez Dictéa dans Applications, puis clic droit → Ouvrir au premier lancement (app non signée).
+- **Windows** : lancez le .exe ; si SmartScreen s'affiche, « Informer seulement ».
+- **Linux** : \`chmod +x Dictea*.AppImage && ./Dictea*.AppImage\`
+
+Gratuit : 1000 mots/mois, sans compte. Transcription par NVIDIA Parakeet TDT 0.6B v3 (© NVIDIA Corporation, CC BY 4.0)."
+          fi
+
+  build:
+    needs: release
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            name: mac-silicon
+          - os: macos-13
+            target: x86_64-apple-darwin
+            name: mac-intel
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            name: windows
+          - os: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+            name: linux
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout du dépôt source privé
+        uses: actions/checkout@v4
+        with:
+          repository: titoune33/dictea
+          ref: ${{ inputs.ref }}
+          ssh-key: ${{ secrets.SOURCE_SSH_KEY }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Rust stable + cible
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Dépendances Linux
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - name: Cache des modèles Parakeet (902 Mo)
+        uses: actions/cache@v4
+        with:
+          path: src/models
+          key: parakeet-int8-v1-${{ matrix.os }}
+
+      - name: Téléchargement des modèles (hors Git)
+        shell: bash
+        run: |
+          mkdir -p src/models
+          for f in encoder-int8.onnx encoder-int8.onnx.data decoder_joint-int8.onnx vocab.txt; do
+            if [ ! -s "src/models/$f" ]; then
+              curl -L --fail --retry 3 --retry-delay 5 -o "src/models/$f" "$HF_BASE/$f"
+            fi
+          done
+          ls -la src/models
+
+      - name: Build + upload sur la release
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          args: --target ${{ matrix.target }}
+          tagName: v${{ inputs.version }}
+          releaseName: Dictéa ${{ inputs.version }}
+          releaseDraft: false
+          prerelease: false
+          includeDebug: false
